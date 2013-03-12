@@ -1,3 +1,20 @@
+/*
+ * =====================================================================================
+ *
+ *       Filename:  keyboard.c
+ *
+ *    Description:  
+ *
+ *        Version:  1.0
+ *        Created:  2013年03月11日 21时06分39秒
+ *       Revision:  none
+ *       Compiler:  gcc
+ *
+ *         Author:  陆唯一 (), 
+ *   Organization:  
+ *
+ * =====================================================================================
+ */
 #include "common.h"
 #include "string.h"
 
@@ -44,4 +61,5 @@ keyboard_event(int code) {
 	key_code = code;
 	press_key(code);
 }
+
 
