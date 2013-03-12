@@ -31,7 +31,7 @@ bool update_keypress(void);
 int get_fps(void);
 void set_fps(int fps);
 aerolite_t get_aerolite_head(void);
-
+int get_score(void);
 void redraw_screen(void);
 
 /* 随机数 */
@@ -40,7 +40,8 @@ void srand(int seed);
 
 /* airplane */
 struct airplane{
-    int x,y;
+    float x,y;
+    int life;
 };
 
 extern struct airplane myairplane;

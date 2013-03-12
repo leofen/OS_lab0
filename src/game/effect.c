@@ -22,10 +22,12 @@
 #include "device/video.h"
 #include "x86/x86.h"
 
+#define square(n) (n)*(n)
+
 #define move_by_key(key,direction,distance,limit) \
     if (query_key((key) - 'a')){ \
         release_key((key) - 'a'); \
-        myairplane. direction = ( (limit) + myairplane. direction + (distance))%(limit) ; \
+        myairplane. direction = (float) (((limit) + (int)myairplane. direction + (distance))%(limit)) ; \
         return true; \
     }
 
@@ -65,6 +67,10 @@ update_aerolite_pos(void){
             aerolite_free(it);
             if(it == aerolite_head)
                 aerolite_head = next;
+        }
+        else{
+            if ( (square(it->x - myairplane.x) + square(it->y - myairplane.y) < 64))//bomb!!
+                myairplane.life--;
         }
         it = next;
     }
