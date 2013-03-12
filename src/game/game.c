@@ -20,9 +20,12 @@
 #include "game.h"
 #include "string.h"
 #include "device/timer.h"
-#define FPS 30
 
-struct airplane myairplane = { 100.0 , 160.0 };
+#define FPS 30
+#define SECOND_TO_NEXT_LEVEL 10
+#define UPDATE_PER_SECOND 100
+
+struct airplane myairplane = { 100 , 160 };
 
 volatile int tick = 0;
 
@@ -45,6 +48,7 @@ main_loop(){
     int now = 0 , target;
     int num_draw = 0;
     int now_fps;
+    int aerolite_per_second = 5;
     bool redraw;
 
     while(TRUE){
@@ -66,6 +70,18 @@ main_loop(){
             
             if (now % (HZ / FPS) == 0){
                 redraw = true;
+            }
+
+            if (now % (SECOND_TO_NEXT_LEVEL * HZ) == 0){
+                aerolite_per_second += 5;
+            }
+
+            if (now % (HZ / aerolite_per_second) == 0){
+                create_new_aerolite();
+            }
+
+            if (now % (HZ / UPDATE_PER_SECOND) == 0){
+                update_aerolite_pos();
             }
 
             if (now % (HZ / 2) == 0){

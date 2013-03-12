@@ -84,6 +84,15 @@ draw_airplane(int x, int y, int color) {
 }
 
 void
+draw_aerolite(int x, int y, int color) {
+    int i, j;
+    for ( i = 0 ; i < 8 ; i++ )
+        for ( j = 0 ; j < 8 ; j++ )
+            if ( (aerolite_basic[i] >> j) & 1 )
+                draw_pixel( x + i , y + j , color );
+}
+
+void
 draw_string(const char *str, int x, int y, int color) {
 	while (*str) {
 		draw_character(*str ++, x, y, color);

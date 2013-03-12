@@ -14,26 +14,23 @@ void release_key(int ch);
 bool query_key(int ch);
 int last_key_code(void);
 
-/* 定义fly_t链表 */
-LINKLIST_DEF(fly)
+/* 定义aerolite_t链表 */
+LINKLIST_DEF(aerolite)
 	float x, y;
-	int text;
-	float v;
-LINKLIST_DEF_FI(fly)
+	float v_x,v_y;
+LINKLIST_DEF_FI(aerolite)
 
 /* 主循环 */
 void main_loop(void);
 
 /* 游戏逻辑相关 */
-void create_new_letter(void);
-void update_letter_pos(void);
+void create_new_aerolite(void);
+void update_aerolite_pos(void);
 bool update_keypress(void);
 
-int get_hit(void);
-int get_miss(void);
 int get_fps(void);
 void set_fps(int fps);
-fly_t characters(void);
+aerolite_t get_aerolite_head(void);
 
 void redraw_screen(void);
 

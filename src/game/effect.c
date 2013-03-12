@@ -29,6 +29,47 @@
         return true; \
     }
 
+LINKLIST_IMPL(aerolite,10000)
+
+static aerolite_t aerolite_head = NULL;
+
+aerolite_t
+get_aerolite_head(void){
+    return aerolite_head;
+}
+
+void
+create_new_aerolite(void){
+    if (aerolite_head == NULL){
+        aerolite_head = aerolite_new();
+    } else {
+        aerolite_t aerolite_now = aerolite_new();
+        aerolite_insert(NULL,aerolite_head,aerolite_now);
+        aerolite_head = aerolite_now;
+    }
+    aerolite_head->x = 0;
+    aerolite_head->y = rand() % (SCR_WIDTH / 8 - 2) * 8 + 8;
+    aerolite_head->v_x = (rand() % 1000 / 1000.0 + 1) / 2.0;
+    aerolite_head->v_y = (rand() % 1000 / 1000.0 - 0.5) / 2.0;
+}
+
+void
+update_aerolite_pos(void){
+    aerolite_t it;
+    for ( it = aerolite_head ; it != NULL ; ){
+        aerolite_t next = it->_next;
+        it->x += it->v_x;
+        it->y += it->v_y;
+        if ( it->x + 8.0 > SCR_HEIGHT || it->y < 0 || it->y + 8 > SCR_WIDTH ){
+            aerolite_remove(it);
+            aerolite_free(it);
+            if(it == aerolite_head)
+                aerolite_head = next;
+        }
+        it = next;
+    }
+}
+
 bool 
 update_keypress(void){
     disable_interrupt();

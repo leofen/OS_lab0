@@ -27,9 +27,18 @@
 */
 void
 redraw_screen() {
+    aerolite_t it;
+
 	prepare_buffer(); /* 准备缓冲区 */
+    
+    for( it = get_aerolite_head() ; it != NULL ; it = it->_next )
+        draw_aerolite(it->x , it->y , 15);
+
     draw_airplane(myairplane.x, myairplane.y, 40);
-	display_buffer(); /* 绘制缓冲区 */
+    draw_string(itoa(get_fps()),0,0,14);
+    draw_string("FPS",0,strlen(itoa(get_fps())) * 8 ,14);
+	
+    display_buffer(); /* 绘制缓冲区 */
 }
 
 
