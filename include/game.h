@@ -41,11 +41,11 @@ void redraw_screen(void);
 int rand(void);
 void srand(int seed);
 
-/* car */
-struct car{
-    float x,y;
+/* airplane */
+struct airplane{
+    int x,y;
 };
 
-struct car* get_car(void);
+extern struct airplane myairplane;
 
 #endif

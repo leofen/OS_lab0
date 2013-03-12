@@ -22,21 +22,20 @@
 #include "device/video.h"
 #include "x86/x86.h"
 
-#define move_by_key(key,direction,distance) \
+#define move_by_key(key,direction,distance,limit) \
     if (query_key((key) - 'a')){ \
         release_key((key) - 'a'); \
-        mycar-> direction += (distance); \
+        myairplane. direction = ( (limit) + myairplane. direction + (distance))%(limit) ; \
         return true; \
     }
 
 bool 
 update_keypress(void){
-    struct car* mycar = get_car();
     disable_interrupt();
-    move_by_key('a',y,-8);
-    move_by_key('d',y,8);
-    move_by_key('w',x,-8);
-    move_by_key('s',x,8);
+    move_by_key('a',y,-8,SCR_WIDTH);
+    move_by_key('d',y,8,SCR_WIDTH);
+    move_by_key('w',x,-8,SCR_HEIGHT - 8);
+    move_by_key('s',x,8,SCR_HEIGHT - 8);
     enable_interrupt();
     return false;
 }

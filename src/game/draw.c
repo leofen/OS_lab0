@@ -27,10 +27,8 @@
 */
 void
 redraw_screen() {
-    struct car* mycar = get_car();	
-    const char *str = "a";
 	prepare_buffer(); /* 准备缓冲区 */
-    draw_string(str,mycar->x,mycar->y,48);
+    draw_airplane(myairplane.x, myairplane.y, 40);
 	display_buffer(); /* 绘制缓冲区 */
 }
 

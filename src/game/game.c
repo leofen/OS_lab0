@@ -22,12 +22,7 @@
 #include "device/timer.h"
 #define FPS 30
 
-static struct car mycar = { 100.0 , 160.0 };
-
-struct car*
-get_car(void){
-    return (struct car*)&mycar;
-}
+struct airplane myairplane = { 100.0 , 160.0 };
 
 volatile int tick = 0;
 
