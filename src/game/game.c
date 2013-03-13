@@ -22,10 +22,11 @@
 #include "device/timer.h"
 
 #define FPS 30
-#define SECOND_TO_NEXT_LEVEL 10
+#define SECOND_TO_NEXT_LEVEL 15
+#define SECOND_BE_INVINCIBLE 3
 #define UPDATE_PER_SECOND 100
 
-struct airplane myairplane = { 180.0 , 160.0 , 1 };
+struct airplane myairplane = { 180.0 , 160.0 , 3 , true};
 
 volatile int tick = 0;
 
@@ -84,6 +85,10 @@ main_loop(){
                     aerolite_per_second += 5;
                 }
 
+                if (now % (SECOND_BE_INVINCIBLE * HZ) == 0){
+                    myairplane.invincible = false;
+                }
+
                 if (now % (HZ / aerolite_per_second) == 0){
                     create_new_aerolite();
                 }
@@ -109,6 +114,14 @@ main_loop(){
         }
         else{
             redraw_screen();
+            while(wait_restart()){
+                myairplane.x = 180.0; myairplane.y = 160.0; myairplane.life = 3; myairplane.invincible = true;
+                tick = 0;
+                now = 0;
+                aerolite_per_second = 5;
+                score = 0;
+                clear_screen();
+            }
         }
     }
 }

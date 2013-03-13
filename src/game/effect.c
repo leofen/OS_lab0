@@ -69,20 +69,44 @@ update_aerolite_pos(void){
                 aerolite_head = next;
         }
         else{
-            if ( (square(it->x - myairplane.x) + square(it->y - myairplane.y) < 64))//bomb!!
+            if ( (myairplane.invincible == false ) && (square(it->x - myairplane.x) + square(it->y - myairplane.y) < 64)){//bomb!!
                 myairplane.life--;
+                myairplane.invincible = true;
+                assert(myairplane.invincible == true);
+            }
         }
         it = next;
+    }
+}
+
+void
+clear_screen(void){
+    while ( aerolite_head != NULL ){
+        aerolite_t it = aerolite_head;
+        aerolite_head = aerolite_head->_next;
+        aerolite_remove(it);
+        aerolite_free(it);
     }
 }
 
 bool 
 update_keypress(void){
     disable_interrupt();
-    move_by_key('a',y,-8,SCR_WIDTH);
-    move_by_key('d',y,8,SCR_WIDTH);
-    move_by_key('w',x,-8,SCR_HEIGHT - 8);
-    move_by_key('s',x,8,SCR_HEIGHT - 8);
+    move_by_key('a',y,-4,SCR_WIDTH);
+    move_by_key('d',y,4,SCR_WIDTH);
+    move_by_key('w',x,-4,SCR_HEIGHT - 8);
+    move_by_key('s',x,4,SCR_HEIGHT - 8);
+    enable_interrupt();
+    return false;
+}
+
+bool 
+wait_restart(void){
+    disable_interrupt();
+    if ( query_key('r' - 'a') ){
+        release_key('r' - 'a');
+        return true;
+    }
     enable_interrupt();
     return false;
 }

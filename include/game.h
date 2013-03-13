@@ -26,7 +26,9 @@ void main_loop(void);
 /* 游戏逻辑相关 */
 void create_new_aerolite(void);
 void update_aerolite_pos(void);
+void clear_screen(void);
 bool update_keypress(void);
+bool wait_restart(void);
 
 int get_fps(void);
 void set_fps(int fps);
@@ -42,6 +44,7 @@ void srand(int seed);
 struct airplane{
     float x,y;
     int life;
+    bool invincible;
 };
 
 extern struct airplane myairplane;

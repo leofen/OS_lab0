@@ -24,4 +24,5 @@ void display_buffer(void);
 void draw_string(const char*, int, int, int);
 void draw_airplane(int x, int y, int color);
 void draw_aerolite(int x, int y, int color);
+void draw_life(int x, int y, int color);
 #endif
