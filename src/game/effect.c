@@ -92,8 +92,8 @@ clear_screen(void){
 bool 
 update_keypress(void){
     disable_interrupt();
-    move_by_key('a',y,-4,SCR_WIDTH);
-    move_by_key('d',y,4,SCR_WIDTH);
+    move_by_key('a',y,-4,SCR_WIDTH - 8);
+    move_by_key('d',y,4,SCR_WIDTH - 8);
     move_by_key('w',x,-4,SCR_HEIGHT - 8);
     move_by_key('s',x,4,SCR_HEIGHT - 8);
     enable_interrupt();
