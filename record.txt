@@ -1,0 +1,75 @@
+Q 1:src/irq/irq_handle.c 中0x60 0x61 端口分别代表什么？
+
+A 1:0x60端口传递按键信号，0x61传递键盘状态
+reference：http://stackoverflow.com/questions/14848645/what-does-this-code-do-in-intel-assembly-language/14853920#14853920
+
+Q 2:我们知道CS, DS, SS,   ES分别代表的是代码、数据、堆栈和临时。那你认为，在通过寄存器访问内存时，默认使用的段寄存器是什么呢？在互联网上搜索以确认你的答案。
+
+A 2:As with the x86 [bx] addressing mode, these four addressing modes reference the byte at the offset found in the bx, bp, si, or di register, respectively. The [bx], [si], and [di] modes use the ds segment by default. The [bp] addressing mode uses the stack segment (ss) by default.
+
+Q 3:Lab0发布的代码，总共有多少个.c文件，多少个.h文件？你是用什么样的shell命令得到你的结果的？
+
+A 3:32行 find . -name *.[ch] | wc -l
+
+Q 4:在所有的.c和.h文件中，单词"volatile"总共出现了多少次？你是用什么样的shell命令得到你的结果的？(hint: 尝试grep命令)检查这些结果，你会发现volatile是C语言的一个关键字，这个关键字起什么样的作用？删除它有什么后果
+
+A 4:find . -name *.[ch] | xargs grep -o  volatile | wc -l
+volatile作用是告诉编译器对该变量不要做优化，每次都从内存中读取值。例如在游戏中用到的tick变量，如果删除volatile变量，由于编译器添加了优化选项，又无法从代码中检测到tick值会发生变化，tick变量就直接被编译器“优化”掉了，以至于每次访问tick都获得其初始值0。尝试删除volatile关键词后游戏由于不对时钟中断做出回应，始终卡在初始状态。
+相关参考链接：http://blog.csdn.net/tigerjb/article/details/7427366 http://zh.wikipedia.org/wiki/Volatile%E5%8F%98%E9%87%8F
+
+Q 5:C语言声明和定义的区别是什么？请注意一个细节：框架代码中所有的函数的声明都在.h文件中，定义都在.c文件中，但有一个例外：inline的函数以static inline的方式定义在.h文件中。这是为什么？如果把函数或变量的定义放到头文件中，会有什么样的后果？
+
+A 5:
+1)《c programming language》中写到“Declarations specify the interpretation given to each identifier; they do not necessarily reserve storage associated with the identifier. Declarations that reserve storage are called definitions.”即声明和定义最大的区别在于前者不分配内存，所以声明可以多次声明，定义却只能有一次。
+2)因为inline函数实质上不是函数调用，只是把调用该函数的地方替换成inline的内容，和宏类似，所以不分配内存，可以直接写在头文件里。
+3)编译器在预处理时会把所有include的文件内容添加到文件中，所以讲声明写在头文件里include一下就能使用变量和函数了，但如果把定义放在头文件中，被别处引用后会导致重定义。
+
+Q 6:Makefile中用ld链接start.o和main.o，编译选项的-e start是什么意义？-Ttext 0x7C00又是什么意义？objcopy中-S, -O binary, -j .text又分别是什么意义
+
+A 6:-e start 表示以start.S里面的start作为程序执行的起点。-Ttext 0x7C00 的意思是设置elf文件文本段的第一个字节地址为0x7C00
+-S 表示不要从源文件拷贝重定位和符号信息。
+-O binary 表示输出文件采用二进制格式。
+-j .text 表示只复制.text字段到输出文件。
+
+Q 7:main.c中的一行代码实现了到游戏的跳转：
+
+    ((void(*)(void))elf->entry)();
+    这段代码的含义是什么？在你的游戏中，elf->entry数值是多少？你是如何得到这个数值的？为什么这段位于0x00007C00附近的代码能够正确跳转到游戏执行？
+
+A 7:0x1005c0 通过GDB连接qemu后，在bootmain的这行代码处设置断点，通过print elf->entry (获得的是十进制)获得entry的值，并用s命令验证确实跳转到了此处。
+因为这里是将entry强制转化成了一个函数指针，并调用它，这样就跳转到了游戏。
+ps:此外还能通过readelf -a game 查看game的入口间接获知此处entry的值。
+
+Q 8:start.S中包含了切换到保护模式的汇编代码。切换到保护模式需要设置正确的GDT，请回答以下问题：什么是GDT？GDT的定义在何处？GDT描述符的定义在何处？游戏是如何进行地址转换的？
+
+A 8:GDT是Global Descriptor Table的缩写，在32位系统的保护模式中通过它实现段式存储。
+GDT的定义在start.S的47行，GDT描述符的定义在start.S的第52行。
+游戏中寻址时，以段寄存器中的值作为索引去GDT中查找真实段地址，再加上偏移量组成真正的地址，进而进行寻址。
+
+Q 9:为什么在编译选项中要使用-Wall和-Werror？-MD选项的作用是什么？
+
+A 9:用-Wall是因为gcc默认关闭警告提示，通过这个选项开启所有警告来。用-Werror是把所有warning当作error处理，从而强制大家审视每个warning，避免bug。
+-MD的作用是寻找文件的依赖，同时写入到.d文件里。
+
+Q 10:Makefile中包含一句：-include $(patsubst %.o, %.d, $(OBJS))。请解释它的功能。注意make工具在编译时使用了隐式规则以默认的方式编译.c和.S文件
+
+A 10:首先变量的意思是把所有obj文件命的后缀改成了.d，.d文件是编译时生成的依赖信息，这样变量就包括了所有依赖的路径。而-include选项的作用是让make到这些路径里搜索有没有需要包括的其他makefile，同时忽略无法读取的文件。
+ps:但由于项目里src下本身没有其它的makefile，这句删掉make也可以工作。
+
+Q 11:请描述make工具从.c, .h和.S文件中生成game.img的过程。
+
+A 11:make首先通过shell命令获得所有.c .S文件路径，根据文件信息推导隐含规则和依赖关系，然后根据依赖关系先依次生成各个obj文件。再通过链接器将各个obj文件链接成game可执行文件。然后进入boot目录执行boot目录下的make命令，此处先将start.S和main.c编译生成bootblock.o，然后通过objcopy工具将其转化为512字节的bootblock，最后通过perl脚本将bootblock的最后四个字节改为0xaa55，这样就生成了引导区。最后make调用cat命令将bootblock和game合并成game.img。
+
+Q 12:include/adt/linklist.h定义了一种通用链表，在游戏中我们使用到它(链表的结构体定义在include/game.h)。另一种通用链表的定义可以参考Linux内核中的list head。这两种链表定义方式有什么不同？各自的优点和缺点是什么？
+
+A 12:lab0中的通用链表是利用宏将我们想使用的数据放在链表节点的定义中，从而获得链表的相关功能。而linux的list是把链表节点作为节点的一个结构成员。两者的区别从宏观上感觉，一个是用链表把我们的数据“包”起来，另一个则相反，是用数据把节点“裹”起来。
+lab0中通用链表的优点在于，由于宏展开后其实和我们平时自己写的链表没有太大本质区别（当然比我们写得好），使用时没有区别，除了调用函数，也能直接通过访问next指针之类的操作自己遍历节点或获取数据。而缺点则是只能表示比较简单的链表结构，嵌套的或者有分支的链表就很难用这种通用链表表示。
+Linux中通用链表的优点在于，由于使用时仅仅是把节点当作struct的一个元素放入，概念上清晰，链表的功能和数据分离，利于构造结构复杂的链表。这种实现可以说是实现了链表功能的一种抽象，从而大大增强了扩展性。缺点则是实现比较麻烦，为了获得整个节点的内容，需要依赖一系列晦涩的宏，在编译器的支持（typeof sizeof）下才能实现。
+
+Q 13:详细说明一次时钟中断从进入系统到处理完毕后返回的过程中，堆栈变化的情况，注意以下几个关键点：中断进入前、硬件跳转到irq0时、call irq_handle前、irq_handle中对堆栈内数据的使用、iret前。
+
+A 13:中断进入前，CPU将EFLAGS，CS和PC压栈，从而保证中断结束后能继续运行原程序。硬件跳转到irq0时，将1000压栈，跳转到asm_do_irq。call irq_handle前，先将所有寄存器值入栈，再把当前帧指针入栈，此时帧指针正指向之前被压栈的寄存器值在栈中的地址。irq_handle中，由于它有一个指针参数，之前被压栈的帧指针就被当成了参数值，而TrapFrame的结构正好和此时栈中帧指针所指的部分一致，把帧指针当作TrapFrame的指针，调用其irq值就得到了之前在跳转到irq0时压栈的1000，然后根据这个值知道是时钟中断，进行对应的中断处理。iret前将之前压栈的帧指针、寄存器值、1000依次出栈。
+
+Q 14:draw.c实现的是绘图功能。如果需要绘制的内容过多，可能会无法维持适当的FPS(例如30FPS要求一帧在大约33ms内绘制完毕)。我们的游戏设计成游戏逻辑优先更新，并丢弃过去未绘制的帧(大部分同学玩大型游戏时都有过类似的体验)。结合代码简述这个机制是如何实现的。
+
+A 14:这个机制主要在game.c里实现，可以看到当游戏逻辑部分比较复杂，运算量较大时，tick值可能比now大很多。这时target就比较大，那么在一次“追赶”的过程中，可能有很多次逻辑更新。最理想情况当然时逻辑更新一次就刷新一次，即redraw每设置一次都刷新一次，但当一次追赶中有多次逻辑更新时，几次的redraw就被压缩成一次了，也就是说在两次刷新间其实有好几次逻辑更新。这就是所谓的“掉帧”机制，严重时就会产生幻灯片和“瞬间移动”的效果。
