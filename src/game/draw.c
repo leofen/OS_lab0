@@ -32,6 +32,7 @@ redraw_screen() {
 
     prepare_buffer(); /* 准备缓冲区 */
 
+    /* 游戏未结束时 */
     if (myairplane.life > 0){
         for( it = get_aerolite_head() ; it != NULL ; it = it->_next )
             draw_aerolite(it->x , it->y , 15);
@@ -43,6 +44,7 @@ redraw_screen() {
         draw_string(itoa(get_score()) , 190 , 0 , 14);
         draw_string("  point" , 190 , strlen(itoa(get_score())) * 8 , 14);
     }
+    /* 游戏结束时 */
     else{
         draw_string("GAME OVER" , 65 , 130 , 30);
         draw_string("FINAL SCORE" , 80 , 130 , 30);

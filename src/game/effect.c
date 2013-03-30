@@ -24,6 +24,7 @@
 
 #define square(n) (n)*(n)
 
+/* 对某一按键响应的宏，limit保证不会越界 */
 #define move_by_key(key,direction,distance,limit) \
     if (query_key((key) - 'a')){ \
         release_key((key) - 'a'); \
@@ -49,6 +50,7 @@ create_new_aerolite(void){
         aerolite_insert(NULL,aerolite_head,aerolite_now);
         aerolite_head = aerolite_now;
     }
+    /* 陨石都从上方掉落，但位置以及两个方向的速度都不固定 */
     aerolite_head->x = 0;
     aerolite_head->y = rand() % (SCR_WIDTH / 8 - 2) * 8 + 8;
     aerolite_head->v_x = (rand() % 1000 / 1000.0 + 1) / 2.0;
@@ -59,16 +61,19 @@ void
 update_aerolite_pos(void){
     aerolite_t it;
     for ( it = aerolite_head ; it != NULL ; ){
+        /* it可能被删去所以要先记录下它的next */
         aerolite_t next = it->_next;
         it->x += it->v_x;
         it->y += it->v_y;
         if ( it->x + 8.0 > SCR_HEIGHT || it->y < 0 || it->y + 8 > SCR_WIDTH ){
+            /* 陨石离开屏幕，从链表中移去并释放其空间 */
             aerolite_remove(it);
             aerolite_free(it);
             if(it == aerolite_head)
                 aerolite_head = next;
         }
         else{
+            /* 飞机不在无敌状态同时和陨石距离小于8，则飞机生命减一同时获得一段时间的无敌 */
             if ( (myairplane.invincible == false ) && (square(it->x - myairplane.x) + square(it->y - myairplane.y) < 64)){//bomb!!
                 myairplane.life--;
                 myairplane.invincible = true;
@@ -79,6 +84,9 @@ update_aerolite_pos(void){
     }
 }
 
+/*
+ * 重新开始游戏时清除所有陨石
+ */
 void
 clear_screen(void){
     while ( aerolite_head != NULL ){

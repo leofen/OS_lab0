@@ -74,6 +74,7 @@ draw_character(char ch, int x, int y, int color) {
 				draw_pixel(x + i, y + j, color);
 }
 
+/* 绘制飞机 */
 void
 draw_airplane(int x, int y, int color) {
     int i, j;
@@ -83,6 +84,7 @@ draw_airplane(int x, int y, int color) {
                 draw_pixel( x + i , y + j , color );
 }
 
+/* 绘制陨石 */
 void
 draw_aerolite(int x, int y, int color) {
     int i, j;
@@ -92,6 +94,7 @@ draw_aerolite(int x, int y, int color) {
                 draw_pixel( x + i , y + j , color );
 }
 
+/* 绘制所剩命数 */
 void
 draw_life(int x, int y, int color) {
     int i, j;

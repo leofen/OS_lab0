@@ -17,7 +17,7 @@ set_keyboard_intr_handler( void (*ptr)(int) ) {
  * 请仔细理解这段程序的含义，这些内容将在后续的实验中被反复使用。 */
 void
 irq_handle(struct TrapFrame *tf) {
-	if (tf->irq == 1000) {
+    if (tf->irq == 1000) {
 		do_timer();
 	} else if (tf->irq == 1001) {
 		uint32_t code = in_byte(0x60);
